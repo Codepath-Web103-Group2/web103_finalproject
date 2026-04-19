@@ -25,6 +25,10 @@ function TaskList({ tasks, handleTaskCompleted }) {
                 <strong>Status:</strong>{" "}
                 {task.completed ? "Completed" : "Pending"}
               </p>
+
+              <p>
+                <strong>Priority:</strong> {task.priority}
+              </p>
             </div>
           ))}
         </div>

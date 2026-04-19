@@ -4,6 +4,7 @@ function TaskForm({ onAddTask }) {
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("");
   const [deadline, setDeadline] = useState("");
+  const [priority, setPriority] = useState('Medium')
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -54,7 +55,14 @@ function TaskForm({ onAddTask }) {
           value={deadline}
           onChange={(e) => setDeadline(e.target.value)}
         />
-
+        <select 
+          value={priority} 
+          onChange={(e) => setPriority(e.target.value)}
+        >
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
         <button type="submit">Save Task</button>
       </form>
     </section>
