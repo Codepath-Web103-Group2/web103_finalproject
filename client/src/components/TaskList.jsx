@@ -1,4 +1,4 @@
-function TaskList({ tasks }) {
+function TaskList({ tasks, handleTaskCompleted }) {
   return (
     <section className="task-list-section">
       <h2>Task List</h2>
@@ -10,7 +10,7 @@ function TaskList({ tasks }) {
       ) : (
         <div className="task-list">
           {tasks.map((task) => (
-            <div className="task-card" key={task.id}>
+            <div className={`task-card ${task.completed ? 'completed' : ''}`} key={task.id} onClick={() => handleTaskCompleted(task.id)}>
               <h3>{task.title}</h3>
 
               <p>

@@ -114,3 +114,22 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+.completed {
+  opacity: 0.5; 
+  background: #edf2f7; 
+  border-color: #d1d5db;
+  text-decoration: line-through;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.completed:hover {
+  opacity: 0.8; 
+}
+
+.completed h3 {
+  text-decoration: line-through;
+  color: #9ca3af;
+}

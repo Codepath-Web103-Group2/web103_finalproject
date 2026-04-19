@@ -25,6 +25,10 @@ function App() {
     setTasks((prev) => [...prev, newTask]);
   };
 
+  const handleTaskCompleted = (id) => {
+    setTasks(tasks.map((task) => task.id === id ? {...task, completed:!task.completed } : task))
+  }
+
   return (
     <div className="app-container">
       <header className="app-header">
@@ -34,7 +38,7 @@ function App() {
 
       <main className="main-layout">
         <TaskForm onAddTask={handleAddTask} />
-        <TaskList tasks={tasks} />
+        <TaskList tasks={tasks} handleTaskCompleted={handleTaskCompleted} />
       </main>
     </div>
   );
