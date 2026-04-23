@@ -132,6 +132,21 @@ body {
   margin-bottom: 10px;
 }
 
+.task-form select {
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: white;
+  cursor: pointer;
+  appearance: none; 
+}
+
+.task-form select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
 .task-card-actions {
   margin-top: 12px;
 }
@@ -144,4 +159,84 @@ body {
   .main-layout {
     grid-template-columns: 1fr;
   }
+}
+
+.completed {
+  opacity: 0.5; 
+  background: #edf2f7; 
+  border-color: #d1d5db;
+  text-decoration: line-through;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.completed:hover {
+  opacity: 0.8; 
+}
+
+.completed h3 {
+  text-decoration: line-through;
+  color: #9ca3af;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filter-controls select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.filter-controls select:focus {
+  outline: 2px solid #2563eb;
+  border-color: transparent;
+}
+
+.progress-section {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 24px;
+  margin-top: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.progress-stats {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.progress-bar-container {
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden; /* Keeps the fill inside the rounded corners */
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  transition: width 0.4s ease-out; /* Makes the bar slide smoothly */
+}
+
+.progress-label {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: #6b7280;
+  text-align: right;
 }

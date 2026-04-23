@@ -18,6 +18,8 @@ function TaskForm({
   const [subject, setSubject] = useState("");
   const [deadline, setDeadline] = useState("");
   const [formError, setFormError] = useState("");
+  const [priority, setPriority] = useState('medium')
+
 
   useEffect(() => {
     const nextTask = editingTask || emptyTask;
@@ -101,6 +103,16 @@ function TaskForm({
           onChange={(e) => setDeadline(e.target.value)}
           required
         />
+
+      <select 
+          value={priority} 
+          onChange={(e) => setPriority(e.target.value)}
+        >
+          <option value="low">low</option>
+          <option value="medium">medium</option>
+          <option value="high">high</option>
+        </select>
+
 
         {formError ? <p className="form-error">{formError}</p> : null}
 

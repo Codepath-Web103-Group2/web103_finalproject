@@ -1,4 +1,4 @@
-function TaskList({ errorMessage, isLoading, onDeleteTask, onEditTask, tasks }) {
+function TaskList({ errorMessage, isLoading, onDeleteTask, onEditTask, tasks, handleCompleteTask }) {
   return (
     <section className="task-list-section">
       <h2>Task List</h2>
@@ -14,7 +14,7 @@ function TaskList({ errorMessage, isLoading, onDeleteTask, onEditTask, tasks }) 
       ) : (
         <div className="task-list">
           {tasks.map((task) => (
-            <div className="task-card" key={task.id}>
+            <div className={`task-card ${task.completed ? 'completed' : ''}`} key={task.id}>
               <h3>{task.title}</h3>
 
               <p>
@@ -30,9 +30,16 @@ function TaskList({ errorMessage, isLoading, onDeleteTask, onEditTask, tasks }) 
                 {task.completed ? "Completed" : "Pending"}
               </p>
 
+              <p>
+                <strong>Priority:</strong> {task.priority}
+              </p>
+
               <div className="task-card-actions">
                 <button type="button" onClick={() => onEditTask(task)}>
                   Edit
+                </button>
+                <button type="button" onClick={() => handleCompleteTask(task.id)}>
+                  Toggle Complete
                 </button>
 
                 <button
