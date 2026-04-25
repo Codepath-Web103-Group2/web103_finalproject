@@ -4,6 +4,7 @@ const emptyTask = {
   title: "",
   description: "",
   deadline: "",
+  priority: "medium",
 };
 
 function TaskForm({
@@ -16,50 +17,46 @@ function TaskForm({
   const initialTask = editingTask || emptyTask;
   const [title, setTitle] = useState(initialTask.title || "");
   const [description, setDescription] = useState(
-    initialTask.description || initialTask.subject || ""
+    initialTask.description || initialTask.subject || "",
   );
   const [deadline, setDeadline] = useState(initialTask.deadline || "");
+  const [priority, setPriority] = useState(initialTask.priority || "medium");
   const [formError, setFormError] = useState("");
 
   const resetForm = () => {
     setTitle("");
     setDescription("");
     setDeadline("");
+    setPriority("medium");
     setFormError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!title.trim() || !description.trim() || !deadline) {
       setFormError("Enter a title, description, and deadline before saving.");
       return;
     }
-
     const taskDetails = {
       title: title.trim(),
       description: description.trim(),
       deadline,
+      priority,
     };
-
     try {
       if (editingTask) {
         await onUpdateTask(taskDetails);
       } else {
         await onCreateTask(taskDetails);
       }
-
       resetForm();
     } catch {
       setFormError(
-        editingTask ? "Unable to update task right now." : "Unable to save task right now."
+        editingTask
+          ? "Unable to update task right now."
+          : "Unable to save task right now.",
       );
     }
-  };
-
-  const handleCancel = () => {
-    resetForm();
-    onCancelEdit();
   };
 
   return (
@@ -70,7 +67,6 @@ function TaskForm({
           ? "Update the selected study task and save your changes."
           : "Add a new study task with details and a deadline."}
       </p>
-
       <form className="task-form" onSubmit={handleSubmit}>
         <input
           type="text"
@@ -79,7 +75,6 @@ function TaskForm({
           onChange={(e) => setTitle(e.target.value)}
           required
         />
-
         <input
           type="text"
           placeholder="Description or subject"
@@ -87,23 +82,31 @@ function TaskForm({
           onChange={(e) => setDescription(e.target.value)}
           required
         />
-
         <input
           type="date"
           value={deadline}
           onChange={(e) => setDeadline(e.target.value)}
           required
         />
-
+        <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+          <option value="high">🔴 High Priority</option>
+          <option value="medium">🟡 Medium Priority</option>
+          <option value="low">🟢 Low Priority</option>
+        </select>
         {formError ? <p className="form-error">{formError}</p> : null}
-
         <div className="task-form-actions">
           <button type="submit" disabled={isSaving}>
             {isSaving ? "Saving..." : editingTask ? "Update Task" : "Save Task"}
           </button>
-
           {editingTask ? (
-            <button className="secondary-button" type="button" onClick={handleCancel}>
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={() => {
+                resetForm();
+                onCancelEdit();
+              }}
+            >
               Cancel
             </button>
           ) : null}
