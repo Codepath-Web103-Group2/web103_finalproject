@@ -1,6 +1,12 @@
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 
+let cachedDevelopmentTransport;
+
+function isProductionEnvironment() {
+  return String(process.env.NODE_ENV || "").toLowerCase() === "production";
+}
+
 function getAppBaseUrl() {
   return process.env.APP_BASE_URL || process.env.CLIENT_APP_URL || "http://localhost:5173";
 }
@@ -19,6 +25,26 @@ function createTransport() {
       pass: process.env.SMTP_PASS,
     },
   });
+}
+
+async function getDevelopmentTransport() {
+  if (cachedDevelopmentTransport) {
+    return cachedDevelopmentTransport;
+  }
+
+  const testAccount = await nodemailer.createTestAccount();
+
+  cachedDevelopmentTransport = nodemailer.createTransport({
+    host: testAccount.smtp.host,
+    port: testAccount.smtp.port,
+    secure: testAccount.smtp.secure,
+    auth: {
+      user: testAccount.user,
+      pass: testAccount.pass,
+    },
+  });
+
+  return cachedDevelopmentTransport;
 }
 
 export function createPasswordResetToken() {
@@ -55,18 +81,27 @@ export async function sendPasswordResetEmail({ email, fullName, resetUrl }) {
     "If you did not request this reset, you can ignore this email.",
   ].join("\n");
 
-  if (!shouldSendEmail()) {
+  const transport = shouldSendEmail()
+    ? createTransport()
+    : isProductionEnvironment()
+      ? null
+      : await getDevelopmentTransport();
+
+  if (!transport) {
+    console.warn("Password reset email was skipped because SMTP is not configured in production.");
     console.log(`Password reset requested for ${email}: ${resetUrl}`);
     return { delivered: false, previewResetUrl: resetUrl };
   }
 
-  const transport = createTransport();
-  await transport.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+  const info = await transport.sendMail({
+    from: process.env.SMTP_FROM || process.env.SMTP_USER || "StudyBuddy Planner <no-reply@studybuddy.dev>",
     to: email,
     subject,
     text,
   });
 
-  return { delivered: true };
+  return {
+    delivered: true,
+    previewResetUrl: nodemailer.getTestMessageUrl(info) || undefined,
+  };
 }
