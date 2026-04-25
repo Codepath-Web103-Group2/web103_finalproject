@@ -4,13 +4,13 @@ CodePath WEB103 Final Project
 
 Designed and developed by: Group 2 - Web 103 Final Project
 
-🔗 Link to deployed app: cooming soon
+🔗 Link to deployed app: https://studybuddyplanner.vercel.app/
 
 ## Group Members
 
 - Thuan Nguyen
 - Roel Crodua
-- Arav Dungrani
+- Thierry Laguerre
 
 ## About
 
@@ -34,7 +34,7 @@ Backend: Node.js, Express.js
 
 Database: PostgreSQL
 
-Deployment: Render
+Deployment: Vercel
 
 ## Features
 
@@ -78,15 +78,33 @@ Deployment: Render
 2. Navigate into the project folder:
    cd <repo-name>
 
-3. Install frontend dependencies:
+3. Create your environment file:
+  Copy `.env.example` to `.env` and replace the placeholder values.
+  Example JWT secret format:
+  `JWT_SECRET="replace-with-a-long-random-secret-like-studybuddy-2026-dev-secret-key"`
+  For password reset emails, configure the SMTP settings in `.env`.
+  If SMTP is not configured, the app returns a development preview reset link instead.
+
+4. Install frontend dependencies:
    cd client
    npm install
 
-4. Install backend dependencies:
+5. Install backend dependencies:
    cd ../server
    npm install
 
-5. Start the frontend and backend servers:
-   npm run dev
+6. Start the frontend and backend servers:
+  Frontend: `cd client && npm run dev`
+  Backend: `cd server && npm start`
+
+## Vercel Deployment
+
+1. Import the repository into Vercel with the project root set to `web103_finalproject`.
+2. Keep the default install command: `npm install`.
+3. Keep the build command: `npm run build`.
+4. Vercel will use `client/dist` as the output directory via `vercel.json`.
+5. Add the environment variables from `.env` in Vercel project settings:
+  `PGDATABASE`, `PGHOST`, `PGPASSWORD`, `PGPORT`, `PGUSER`, `PGSSLMODE`, `JWT_SECRET`, `APP_BASE_URL`, and any SMTP variables needed for production email delivery.
+6. Redeploy after saving the environment variables.
 
 Project structure and setup steps will be updated as development begins in later milestones.
