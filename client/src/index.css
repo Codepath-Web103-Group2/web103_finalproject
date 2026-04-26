@@ -294,6 +294,15 @@ body {
   margin-top: 12px;
 }
 
+.task-timer {
+  font-weight: 600;
+  color: #174ea6;
+}
+
+.task-timer-expired {
+  color: #b91c1c;
+}
+
 .empty-message {
   color: #5f6b7a;
 }

@@ -1,6 +1,60 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const PRIORITY_LABEL = { high: "🔴 High", medium: "🟡 Medium", low: "🟢 Low" };
+
+function getDeadlineTimestamp(deadline) {
+  if (!deadline) {
+    return null;
+  }
+
+  const deadlineDate = new Date(`${deadline}T23:59:59`);
+  return Number.isNaN(deadlineDate.getTime()) ? null : deadlineDate.getTime();
+}
+
+function formatDuration(milliseconds) {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  const segments = [];
+
+  if (days > 0) {
+    segments.push(`${days}d`);
+  }
+
+  segments.push(`${String(hours).padStart(2, "0")}h`);
+  segments.push(`${String(minutes).padStart(2, "0")}m`);
+  segments.push(`${String(seconds).padStart(2, "0")}s`);
+
+  return segments.join(" ");
+}
+
+function getCountdownState(deadline, now) {
+  const deadlineTimestamp = getDeadlineTimestamp(deadline);
+
+  if (!deadlineTimestamp) {
+    return {
+      isExpired: false,
+      label: "Timer unavailable",
+    };
+  }
+
+  const remainingMilliseconds = deadlineTimestamp - now;
+
+  if (remainingMilliseconds < 0) {
+    return {
+      isExpired: true,
+      label: `Lapsed by ${formatDuration(Math.abs(remainingMilliseconds))}`,
+    };
+  }
+
+  return {
+    isExpired: false,
+    label: `${formatDuration(remainingMilliseconds)} left`,
+  };
+}
 
 function TaskList({
   errorMessage,
@@ -14,6 +68,15 @@ function TaskList({
 }) {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterPriority, setFilterPriority] = useState("all");
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
 
   const filtered = tasks.filter((t) => {
     const statusOk =
@@ -94,44 +157,53 @@ function TaskList({
         <p className="empty-message">No tasks found.</p>
       ) : (
         <div className="task-list">
-          {filtered.map((task) => (
-            <div
-              className={`task-card ${task.completed ? "task-completed" : ""}`}
-              key={task.id}
-            >
-              <div className="task-card-header">
-                <h3>{task.title}</h3>
-                <span className={`priority-badge priority-${task.priority}`}>
-                  {PRIORITY_LABEL[task.priority] || task.priority}
-                </span>
-              </div>
-              <p>
-                <strong>Description:</strong> {task.description || task.subject}
-              </p>
-              <p>
-                <strong>Deadline:</strong> {task.deadline}
-              </p>
-              <p>
-                <strong>Status:</strong>{" "}
-                {task.completed ? "✅ Completed" : "⏳ Pending"}
-              </p>
-              <div className="task-card-actions">
-                <button type="button" onClick={() => onToggleComplete(task)}>
-                  {task.completed ? "Mark Pending" : "Mark Complete"}
-                </button>
-                <button type="button" onClick={() => handleEdit(task)}>
-                  Edit
-                </button>
-                <button
-                  className="secondary-button"
-                  type="button"
-                  onClick={() => handleDelete(task.id, task.title)}
+          {filtered.map((task) => {
+            const countdown = getCountdownState(task.deadline, currentTime);
+
+            return (
+              <div
+                className={`task-card ${task.completed ? "task-completed" : ""}`}
+                key={task.id}
+              >
+                <div className="task-card-header">
+                  <h3>{task.title}</h3>
+                  <span className={`priority-badge priority-${task.priority}`}>
+                    {PRIORITY_LABEL[task.priority] || task.priority}
+                  </span>
+                </div>
+                <p>
+                  <strong>Description:</strong> {task.description || task.subject}
+                </p>
+                <p>
+                  <strong>Deadline:</strong> {task.deadline}
+                </p>
+                <p
+                  className={`task-timer ${countdown.isExpired ? "task-timer-expired" : ""}`}
                 >
-                  Delete
-                </button>
+                  <strong>Time Remaining:</strong> {countdown.label}
+                </p>
+                <p>
+                  <strong>Status:</strong>{" "}
+                  {task.completed ? "✅ Completed" : "⏳ Pending"}
+                </p>
+                <div className="task-card-actions">
+                  <button type="button" onClick={() => onToggleComplete(task)}>
+                    {task.completed ? "Mark Pending" : "Mark Complete"}
+                  </button>
+                  <button type="button" onClick={() => handleEdit(task)}>
+                    Edit
+                  </button>
+                  <button
+                    className="secondary-button"
+                    type="button"
+                    onClick={() => handleDelete(task.id, task.title)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </section>
