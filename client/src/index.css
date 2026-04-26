@@ -3,9 +3,47 @@
 }
 
 :root {
-  color: #102033;
   font-family: "Segoe UI", "Helvetica Neue", sans-serif;
-  background:
+  color: #102033;
+  color-scheme: light;
+  --page-text: #102033;
+  --page-subtle: #4d5c6d;
+  --panel-text: #102033;
+  --panel-subtle: #5f6b7a;
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-strong: rgba(255, 255, 255, 0.95);
+  --surface-alt: rgba(255, 247, 236, 0.8);
+  --surface-border: rgba(255, 255, 255, 0.7);
+  --shadow: 0 20px 40px rgba(16, 32, 51, 0.1);
+  --input-border: #d2dae5;
+  --input-focus: #3b82f6;
+  --button-primary: #102033;
+  --button-primary-hover: #1c3553;
+  --button-secondary: #d7dde7;
+  --button-secondary-hover: #c3ccda;
+  --button-secondary-text: #102033;
+  --accent: #9a4d14;
+  --task-card-border: #edf0f5;
+  --task-card-bg: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(244, 247, 252, 0.95)
+  );
+  --timer-text: #174ea6;
+  --error-text: #b91c1c;
+  --success-text: #0f766e;
+  --empty-text: #5f6b7a;
+  --filter-border: #ccc;
+  --progress-track: #e2e8f0;
+  --progress-fill: #3b82f6;
+  --priority-high-bg: #fee2e2;
+  --priority-high-text: #b91c1c;
+  --priority-medium-bg: #fef9c3;
+  --priority-medium-text: #92400e;
+  --priority-low-bg: #dcfce7;
+  --priority-low-text: #166534;
+  --completed-border: #22c55e;
+  --page-background:
     radial-gradient(
       circle at top left,
       rgba(255, 211, 138, 0.55),
@@ -19,11 +57,66 @@
     linear-gradient(145deg, #f6efe4 0%, #eef4ff 48%, #e8f3ef 100%);
 }
 
+:root[data-theme="dark"] {
+  color: #ecf4ff;
+  color-scheme: dark;
+  --page-text: #ecf4ff;
+  --page-subtle: #b6c5dc;
+  --panel-text: #f4f8ff;
+  --panel-subtle: #a9b7cd;
+  --surface: rgba(11, 19, 34, 0.82);
+  --surface-strong: rgba(18, 28, 48, 0.96);
+  --surface-alt: rgba(26, 36, 58, 0.92);
+  --surface-border: rgba(129, 146, 176, 0.22);
+  --shadow: 0 22px 44px rgba(0, 0, 0, 0.34);
+  --input-border: #34435d;
+  --input-focus: #7cb7ff;
+  --button-primary: #ecf4ff;
+  --button-primary-hover: #cfe0ff;
+  --button-secondary: #24324b;
+  --button-secondary-hover: #32425f;
+  --button-secondary-text: #ecf4ff;
+  --accent: #f8bb7c;
+  --task-card-border: #293550;
+  --task-card-bg: linear-gradient(
+    180deg,
+    rgba(18, 28, 48, 0.98),
+    rgba(13, 22, 38, 0.96)
+  );
+  --timer-text: #7cb7ff;
+  --error-text: #fca5a5;
+  --success-text: #6ee7b7;
+  --empty-text: #a9b7cd;
+  --filter-border: #3b4b67;
+  --progress-track: #22304a;
+  --progress-fill: #60a5fa;
+  --priority-high-bg: rgba(127, 29, 29, 0.35);
+  --priority-high-text: #fecaca;
+  --priority-medium-bg: rgba(133, 77, 14, 0.35);
+  --priority-medium-text: #fde68a;
+  --priority-low-bg: rgba(22, 101, 52, 0.35);
+  --priority-low-text: #bbf7d0;
+  --completed-border: #4ade80;
+  --page-background:
+    radial-gradient(
+      circle at top left,
+      rgba(90, 73, 34, 0.52),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at right,
+      rgba(58, 104, 176, 0.28),
+      transparent 34%
+    ),
+    linear-gradient(145deg, #09111f 0%, #0d1830 45%, #081821 100%);
+}
+
 body {
   margin: 0;
   min-width: 320px;
-  background: transparent;
-  color: #102033;
+  background: var(--page-background);
+  color: var(--page-text);
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 #root {
@@ -49,12 +142,13 @@ body {
 .auth-card,
 .task-form-section,
 .task-list-section {
-  background: rgba(255, 255, 255, 0.82);
+  background: var(--surface);
   backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--surface-border);
   border-radius: 24px;
   padding: 24px;
-  box-shadow: 0 20px 40px rgba(16, 32, 51, 0.1);
+  box-shadow: var(--shadow);
+  color: var(--panel-text);
 }
 
 .auth-showcase {
@@ -64,13 +158,19 @@ body {
   justify-content: center;
 }
 
+.auth-toolbar {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .auth-eyebrow {
   margin: 0 0 10px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   font-size: 0.78rem;
   font-weight: 700;
-  color: #9a4d14;
+  color: var(--accent);
 }
 
 .auth-showcase h1,
@@ -91,7 +191,7 @@ body {
 
 .auth-subtitle {
   max-width: 42rem;
-  color: #4d5c6d;
+  color: var(--page-subtle);
   font-size: 1.05rem;
   line-height: 1.6;
 }
@@ -108,7 +208,7 @@ body {
   gap: 4px;
   padding: 14px 16px;
   border-radius: 16px;
-  background: rgba(255, 247, 236, 0.8);
+  background: var(--surface-alt);
 }
 
 .auth-highlights strong {
@@ -116,7 +216,7 @@ body {
 }
 
 .auth-highlights span {
-  color: #5f6b7a;
+  color: var(--panel-subtle);
 }
 
 .auth-card {
@@ -131,7 +231,7 @@ body {
   gap: 8px;
   padding: 6px;
   margin-bottom: 22px;
-  background: #eef2f8;
+  background: var(--surface-alt);
   border-radius: 999px;
 }
 
@@ -141,14 +241,14 @@ body {
   padding: 10px 18px;
   font-size: 0.96rem;
   font-weight: 700;
-  color: #445260;
+  color: var(--panel-subtle);
   background: transparent;
   cursor: pointer;
 }
 
 .auth-tabs button.active {
-  background: #102033;
-  color: #ffffff;
+  background: var(--button-primary);
+  color: var(--surface-strong);
 }
 
 .app-header {
@@ -168,7 +268,7 @@ body {
 .form-note {
   margin-top: -6px;
   margin-bottom: 16px;
-  color: #5f6b7a;
+  color: var(--panel-subtle);
   font-size: 0.95rem;
 }
 
@@ -181,10 +281,11 @@ body {
 .task-form input,
 .task-form select {
   padding: 12px;
-  border: 1px solid #d2dae5;
+  border: 1px solid var(--input-border);
   border-radius: 12px;
   font-size: 1rem;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--surface-strong);
+  color: var(--panel-text);
 }
 
 .task-form-actions,
@@ -195,13 +296,13 @@ body {
 
 .form-error {
   margin: 0;
-  color: #b91c1c;
+  color: var(--error-text);
   font-size: 0.95rem;
 }
 
 .form-success {
   margin: 0;
-  color: #0f766e;
+  color: var(--success-text);
   font-size: 0.95rem;
 }
 
@@ -211,17 +312,18 @@ body {
   padding: 12px;
   border: none;
   border-radius: 12px;
-  background: #102033;
-  color: white;
+  background: var(--button-primary);
+  color: var(--surface-strong);
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .task-form button:hover,
 .task-card-actions button:hover,
 .header-button:hover {
-  background: #1c3553;
+  background: var(--button-primary-hover);
 }
 
 .task-form button:disabled,
@@ -231,12 +333,16 @@ body {
 }
 
 .secondary-button {
-  background: #d7dde7;
-  color: #102033;
+  background: var(--button-secondary);
+  color: var(--button-secondary-text);
 }
 
 .secondary-button:hover {
-  background: #c3ccda;
+  background: var(--button-secondary-hover);
+}
+
+.theme-toggle {
+  min-width: 118px;
 }
 
 .auth-secondary-actions {
@@ -249,14 +355,14 @@ body {
   padding: 0;
   border: none;
   background: transparent;
-  color: #9a4d14;
+  color: var(--accent);
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
 }
 
 .auth-link-preview {
-  color: #9a4d14;
+  color: var(--accent);
   font-size: 0.95rem;
   font-weight: 700;
   text-decoration: none;
@@ -275,14 +381,10 @@ body {
 }
 
 .task-card {
-  border: 1px solid #edf0f5;
+  border: 1px solid var(--task-card-border);
   border-radius: 18px;
   padding: 18px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.98),
-    rgba(244, 247, 252, 0.95)
-  );
+  background: var(--task-card-bg);
 }
 
 .task-card h3 {
@@ -296,15 +398,15 @@ body {
 
 .task-timer {
   font-weight: 600;
-  color: #174ea6;
+  color: var(--timer-text);
 }
 
 .task-timer-expired {
-  color: #b91c1c;
+  color: var(--error-text);
 }
 
 .empty-message {
-  color: #5f6b7a;
+  color: var(--empty-text);
 }
 
 @media (max-width: 768px) {
@@ -331,26 +433,28 @@ body {
 .filter-bar select {
   padding: 0.4rem 0.6rem;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--filter-border);
   font-size: 0.9rem;
   cursor: pointer;
+  background: var(--surface-strong);
+  color: var(--panel-text);
 }
 .progress-bar-container {
   margin-bottom: 1rem;
 }
 .progress-label {
   font-size: 0.85rem;
-  color: #555;
+  color: var(--panel-subtle);
   margin-bottom: 4px;
 }
 .progress-bar-bg {
-  background: #e2e8f0;
+  background: var(--progress-track);
   border-radius: 999px;
   height: 10px;
   overflow: hidden;
 }
 .progress-bar-fill {
-  background: #3b82f6;
+  background: var(--progress-fill);
   height: 100%;
   border-radius: 999px;
   transition: width 0.3s ease;
@@ -369,37 +473,37 @@ body {
   white-space: nowrap;
 }
 .priority-high {
-  background: #fee2e2;
-  color: #b91c1c;
+  background: var(--priority-high-bg);
+  color: var(--priority-high-text);
 }
 .priority-medium {
-  background: #fef9c3;
-  color: #92400e;
+  background: var(--priority-medium-bg);
+  color: var(--priority-medium-text);
 }
 .priority-low {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--priority-low-bg);
+  color: var(--priority-low-text);
 }
 .task-completed {
   opacity: 0.65;
-  border-left: 4px solid #22c55e;
+  border-left: 4px solid var(--completed-border);
 }
 
 .task-form select {
   width: 100%;
   padding: 0.75rem 1rem;
   border-radius: 8px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--input-border);
   font-size: 1rem;
-  background-color: #fff;
+  background-color: var(--surface-strong);
   cursor: pointer;
   appearance: auto;
 }
 
 .task-form select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--input-focus) 22%, transparent);
 }
 
 .header-right {
@@ -411,16 +515,31 @@ body {
 .search-input {
   padding: 0.5rem 1rem;
   border-radius: 8px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--input-border);
   font-size: 0.95rem;
   width: 300px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--surface-strong);
+  color: var(--panel-text);
   height: 42px;
   box-sizing: border-box;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--input-focus) 22%, transparent);
+}
+
+.task-form input:focus,
+.task-form select:focus,
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--input-focus) 22%, transparent);
+}
+
+.task-form input::placeholder,
+.search-input::placeholder,
+.auth-form input::placeholder {
+  color: var(--panel-subtle);
 }

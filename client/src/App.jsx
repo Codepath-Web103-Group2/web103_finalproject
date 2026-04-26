@@ -4,6 +4,7 @@ import TaskList from "./components/TaskList";
 import "./index.css";
 
 const authStorageKey = "studybuddy-auth";
+const themeStorageKey = "studybuddy-theme";
 
 function getStoredSession() {
   const storedValue = window.localStorage.getItem(authStorageKey);
@@ -32,10 +33,27 @@ function clearStoredSession() {
   window.localStorage.removeItem(authStorageKey);
 }
 
+function getInitialTheme() {
+  if (typeof window === "undefined") {
+    return "light";
+  }
+
+  const storedTheme = window.localStorage.getItem(themeStorageKey);
+
+  if (storedTheme === "light" || storedTheme === "dark") {
+    return storedTheme;
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
 function App() {
   const initialUrl = new URL(window.location.href);
   const initialResetMode = initialUrl.searchParams.get("mode") === "reset";
   const [{ token: storedToken, user: storedUser }] = useState(getStoredSession);
+  const [theme, setTheme] = useState(getInitialTheme);
   const [authMode, setAuthMode] = useState(
     initialResetMode ? "reset" : "login",
   );
@@ -61,6 +79,11 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem(themeStorageKey, theme);
+  }, [theme]);
 
   const handleLogout = () => {
     clearStoredSession();
@@ -406,6 +429,19 @@ function App() {
   if (isCheckingSession) {
     return (
       <div className="auth-shell">
+        <div className="auth-toolbar">
+          <button
+            className="secondary-button theme-toggle"
+            type="button"
+            onClick={() =>
+              setTheme((currentTheme) =>
+                currentTheme === "dark" ? "light" : "dark",
+              )
+            }
+          >
+            {theme === "dark" ? "Light mode" : "Dark mode"}
+          </button>
+        </div>
         <div className="auth-card">
           <p className="auth-eyebrow">StudyBuddy Planner</p>
           <h1>Restoring your workspace</h1>
@@ -422,6 +458,19 @@ function App() {
 
     return (
       <div className="auth-shell">
+        <div className="auth-toolbar">
+          <button
+            className="secondary-button theme-toggle"
+            type="button"
+            onClick={() =>
+              setTheme((currentTheme) =>
+                currentTheme === "dark" ? "light" : "dark",
+              )
+            }
+          >
+            {theme === "dark" ? "Light mode" : "Dark mode"}
+          </button>
+        </div>
         <section className="auth-showcase">
           <p className="auth-eyebrow">StudyBuddy Planner</p>
           <h1>Private study planning for every semester sprint.</h1>
@@ -606,6 +655,17 @@ function App() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
+          <button
+            className="secondary-button header-button theme-toggle"
+            type="button"
+            onClick={() =>
+              setTheme((currentTheme) =>
+                currentTheme === "dark" ? "light" : "dark",
+              )
+            }
+          >
+            {theme === "dark" ? "Light mode" : "Dark mode"}
+          </button>
           <button
             className="secondary-button header-button"
             type="button"
