@@ -1,0 +1,14 @@
+{
+  "name": "studybuddy-planner",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace client",
+    "dev:client": "npm run dev --workspace client",
+    "dev:server": "npm run start --workspace server"
+  }
+}
