@@ -36,7 +36,9 @@ function App() {
   const initialUrl = new URL(window.location.href);
   const initialResetMode = initialUrl.searchParams.get("mode") === "reset";
   const [{ token: storedToken, user: storedUser }] = useState(getStoredSession);
-  const [authMode, setAuthMode] = useState(initialResetMode ? "reset" : "login");
+  const [authMode, setAuthMode] = useState(
+    initialResetMode ? "reset" : "login",
+  );
   const [authForm, setAuthForm] = useState({
     fullName: "",
     email: initialUrl.searchParams.get("email") || "",
@@ -48,7 +50,9 @@ function App() {
   const [authMessage, setAuthMessage] = useState("");
   const [previewResetUrl, setPreviewResetUrl] = useState("");
   const [isAuthenticating, setIsAuthenticating] = useState(false);
-  const [isCheckingSession, setIsCheckingSession] = useState(Boolean(storedToken));
+  const [isCheckingSession, setIsCheckingSession] = useState(
+    Boolean(storedToken),
+  );
   const [tasks, setTasks] = useState([]);
   const [token, setToken] = useState(storedToken);
   const [user, setUser] = useState(storedUser);
@@ -56,6 +60,7 @@ function App() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleLogout = () => {
     clearStoredSession();
@@ -91,7 +96,9 @@ function App() {
         clearStoredSession();
         setToken("");
         setUser(null);
-        setAuthError(error.message || "Your session has expired. Please log in again.");
+        setAuthError(
+          error.message || "Your session has expired. Please log in again.",
+        );
       } finally {
         setIsCheckingSession(false);
       }
@@ -213,7 +220,10 @@ function App() {
         },
       };
 
-      if (authMode === "reset" && authForm.password !== authForm.confirmPassword) {
+      if (
+        authMode === "reset" &&
+        authForm.password !== authForm.confirmPassword
+      ) {
         throw new Error("Passwords do not match.");
       }
 
@@ -232,7 +242,10 @@ function App() {
       }
 
       if (authMode === "forgot") {
-        setAuthMessage(data.message || "If an account matches that email, a reset link has been sent.");
+        setAuthMessage(
+          data.message ||
+            "If an account matches that email, a reset link has been sent.",
+        );
         setPreviewResetUrl(data.previewResetUrl || "");
         return;
       }
@@ -252,7 +265,13 @@ function App() {
       setToken(data.token);
       setUser(data.user);
       saveSession(data.token, data.user);
-      setAuthForm({ fullName: "", email: "", password: "", confirmPassword: "", token: "" });
+      setAuthForm({
+        fullName: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        token: "",
+      });
     } catch (error) {
       setAuthError(error.message || `Unable to ${authMode}.`);
     } finally {
@@ -313,13 +332,40 @@ function App() {
         throw new Error(data.error || "Unable to update task.");
       }
 
-      setTasks((prev) => prev.map((task) => (task.id === data.id ? data : task)));
+      setTasks((prev) =>
+        prev.map((task) => (task.id === data.id ? data : task)),
+      );
       setEditingTask(null);
     } catch (error) {
       setErrorMessage(error.message || "Unable to update task.");
       throw error;
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleToggleComplete = async (task) => {
+    setErrorMessage("");
+    try {
+      const response = await fetch(`/api/tasks/${task.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: task.title,
+          description: task.description,
+          deadline: task.deadline,
+          priority: task.priority,
+          completed: !task.completed,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Unable to update task.");
+      setTasks((prev) => prev.map((t) => (t.id === data.id ? data : t)));
+    } catch (error) {
+      setErrorMessage(error.message || "Unable to update task.");
     }
   };
 
@@ -380,8 +426,8 @@ function App() {
           <p className="auth-eyebrow">StudyBuddy Planner</p>
           <h1>Private study planning for every semester sprint.</h1>
           <p className="auth-subtitle">
-            Create an account to keep your assignments, deadlines, and priorities tied to
-            your own workspace.
+            Create an account to keep your assignments, deadlines, and
+            priorities tied to your own workspace.
           </p>
 
           <div className="auth-highlights">
@@ -402,7 +448,11 @@ function App() {
 
         <section className="auth-card">
           {!isForgot && !isReset ? (
-            <div className="auth-tabs" role="tablist" aria-label="Authentication options">
+            <div
+              className="auth-tabs"
+              role="tablist"
+              aria-label="Authentication options"
+            >
               <button
                 type="button"
                 className={authMode === "login" ? "active" : ""}
@@ -513,13 +563,21 @@ function App() {
 
           <div className="auth-secondary-actions">
             {authMode === "login" ? (
-              <button type="button" className="auth-link-button" onClick={() => switchAuthMode("forgot")}>
+              <button
+                type="button"
+                className="auth-link-button"
+                onClick={() => switchAuthMode("forgot")}
+              >
                 Forgot password?
               </button>
             ) : null}
 
-            {(isForgot || isReset) ? (
-              <button type="button" className="auth-link-button" onClick={() => switchAuthMode("login")}>
+            {isForgot || isReset ? (
+              <button
+                type="button"
+                className="auth-link-button"
+                onClick={() => switchAuthMode("login")}
+              >
                 Back to login
               </button>
             ) : null}
@@ -535,12 +593,27 @@ function App() {
         <div>
           <p className="auth-eyebrow">StudyBuddy Planner</p>
           <h1>{user.fullName.split(" ")[0]}'s Dashboard</h1>
-          <p className="auth-subtitle">Plan your study tasks and keep them attached to your account.</p>
+          <p className="auth-subtitle">
+            Plan your study tasks and keep them attached to your account.
+          </p>
         </div>
 
-        <button className="secondary-button header-button" type="button" onClick={handleLogout}>
-          Log Out
-        </button>
+        <div className="header-right">
+          <input
+            type="text"
+            className="search-input"
+            placeholder="🔍 Search tasks..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <button
+            className="secondary-button header-button"
+            type="button"
+            onClick={handleLogout}
+          >
+            Log Out
+          </button>
+        </div>
       </header>
 
       <main className="main-layout">
@@ -557,8 +630,10 @@ function App() {
           isLoading={isLoading}
           onDeleteTask={handleDeleteTask}
           onEditTask={setEditingTask}
+          onToggleComplete={handleToggleComplete}
           tasks={tasks}
           user={user}
+          searchQuery={searchQuery}
         />
       </main>
     </div>
