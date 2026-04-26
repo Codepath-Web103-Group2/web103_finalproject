@@ -11,6 +11,16 @@ function getAppBaseUrl() {
   return process.env.APP_BASE_URL || process.env.CLIENT_APP_URL || "http://localhost:5173";
 }
 
+function createDevelopmentResetFallback(email, resetUrl) {
+  console.warn(`Password reset email could not be delivered for ${email}. Falling back to development reset URL.`);
+  console.log(`Password reset requested for ${email}: ${resetUrl}`);
+
+  return {
+    delivered: false,
+    previewResetUrl: resetUrl,
+  };
+}
+
 function shouldSendEmail() {
   return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
 }
@@ -93,15 +103,24 @@ export async function sendPasswordResetEmail({ email, fullName, resetUrl }) {
     return { delivered: false, previewResetUrl: resetUrl };
   }
 
-  const info = await transport.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER || "StudyBuddy Planner <no-reply@studybuddy.dev>",
-    to: email,
-    subject,
-    text,
-  });
+  try {
+    const info = await transport.sendMail({
+      from: process.env.SMTP_FROM || process.env.SMTP_USER || "StudyBuddy Planner <no-reply@studybuddy.dev>",
+      to: email,
+      subject,
+      text,
+    });
 
-  return {
-    delivered: true,
-    previewResetUrl: nodemailer.getTestMessageUrl(info) || undefined,
-  };
+    return {
+      delivered: true,
+      previewResetUrl: nodemailer.getTestMessageUrl(info) || undefined,
+    };
+  } catch (error) {
+    if (isProductionEnvironment()) {
+      throw error;
+    }
+
+    console.warn("SMTP delivery failed during development.", error);
+    return createDevelopmentResetFallback(email, resetUrl);
+  }
 }
