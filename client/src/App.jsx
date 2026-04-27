@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import TaskForm from "./components/TaskForm";
 import TaskList from "./components/TaskList";
 import "./index.css";
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 
 const authStorageKey = "studybuddy-auth";
 const themeStorageKey = "studybuddy-theme";
@@ -109,9 +110,7 @@ function App() {
   const isDarkTheme = theme === "dark";
 
   const toggleTheme = () => {
-    setTheme((currentTheme) =>
-      currentTheme === "dark" ? "light" : "dark",
-    );
+    setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"));
   };
 
   const renderThemeToggle = (className = "") => (
@@ -160,7 +159,10 @@ function App() {
     }
 
     requestAnimationFrame(() => {
-      taskFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      taskFormRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     });
   };
 
@@ -177,7 +179,7 @@ function App() {
       }
 
       try {
-        const response = await fetch("/api/auth/me", {
+        const response = await fetch(`${API_BASE}/api/auth/me`, {
           headers: {
             Authorization: `Bearer ${storedToken}`,
           },
@@ -217,7 +219,7 @@ function App() {
       try {
         setIsLoading(true);
         setErrorMessage("");
-        const response = await fetch("/api/tasks", {
+        const response = await fetch(`${API_BASE}/api/tasks`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -292,10 +294,10 @@ function App() {
 
     try {
       const endpointByMode = {
-        login: "/api/auth/login",
-        signup: "/api/auth/signup",
-        forgot: "/api/auth/forgot-password",
-        reset: "/api/auth/reset-password",
+        login: `${API_BASE}/api/auth/login`,
+        signup: `${API_BASE}/api/auth/signup`,
+        forgot: `${API_BASE}/api/auth/forgot-password`,
+        reset: `${API_BASE}/api/auth/reset-password`,
       };
 
       const requestBodyByMode = {
@@ -382,7 +384,7 @@ function App() {
     setErrorMessage("");
 
     try {
-      const response = await fetch("/api/tasks", {
+      const response = await fetch(`${API_BASE}/api/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -416,7 +418,7 @@ function App() {
     setErrorMessage("");
 
     try {
-      const response = await fetch(`/api/tasks/${editingTask.id}`, {
+      const response = await fetch(`${API_BASE}/api/tasks/${editingTask.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -447,7 +449,7 @@ function App() {
   const handleToggleComplete = async (task) => {
     setErrorMessage("");
     try {
-      const response = await fetch(`/api/tasks/${task.id}`, {
+      const response = await fetch(`${API_BASE}/api/tasks/${task.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -473,7 +475,7 @@ function App() {
     setErrorMessage("");
 
     try {
-      const response = await fetch(`/api/tasks/${taskId}`, {
+      const response = await fetch(`${API_BASE}/api/tasks/${taskId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
