@@ -61,12 +61,16 @@ function TaskForm({
 
   return (
     <section className="task-form-section">
-      <h2>{editingTask ? "Edit Task" : "Create Task"}</h2>
-      <p className="form-note">
-        {editingTask
-          ? "Update the selected study task and save your changes."
-          : "Add a new study task with details and a deadline."}
-      </p>
+      <div className="task-form-header-row">
+        <div>
+          <h2>{editingTask ? "Edit Task" : "Create Task"}</h2>
+          <p className="form-note">
+            {editingTask
+              ? "Update the selected study task and save your changes."
+              : "Add a new study task with details and a deadline."}
+          </p>
+        </div>
+      </div>
       <form className="task-form" onSubmit={handleSubmit}>
         <input
           type="text"
