@@ -85,6 +85,41 @@ function App() {
     window.localStorage.setItem(themeStorageKey, theme);
   }, [theme]);
 
+  const isDarkTheme = theme === "dark";
+
+  const toggleTheme = () => {
+    setTheme((currentTheme) =>
+      currentTheme === "dark" ? "light" : "dark",
+    );
+  };
+
+  const renderThemeToggle = (className = "") => (
+    <button
+      className={["secondary-button", "theme-toggle", className]
+        .filter(Boolean)
+        .join(" ")}
+      type="button"
+      onClick={toggleTheme}
+      aria-label={`Switch to ${isDarkTheme ? "light" : "dark"} mode`}
+      aria-pressed={isDarkTheme}
+    >
+      <span className="theme-toggle-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <circle cx="12" cy="12" r="4.5" />
+          <path d="M12 2.5v2.25M12 19.25v2.25M21.5 12h-2.25M4.75 12H2.5M18.72 5.28l-1.6 1.59M6.88 17.12l-1.6 1.6M18.72 18.72l-1.6-1.6M6.88 6.88l-1.6-1.6" />
+        </svg>
+      </span>
+      <span className="theme-toggle-track" aria-hidden="true">
+        <span className="theme-toggle-thumb" />
+      </span>
+      <span className="theme-toggle-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7Z" />
+        </svg>
+      </span>
+    </button>
+  );
+
   const handleLogout = () => {
     clearStoredSession();
     setToken("");
@@ -429,19 +464,7 @@ function App() {
   if (isCheckingSession) {
     return (
       <div className="auth-shell">
-        <div className="auth-toolbar">
-          <button
-            className="secondary-button theme-toggle"
-            type="button"
-            onClick={() =>
-              setTheme((currentTheme) =>
-                currentTheme === "dark" ? "light" : "dark",
-              )
-            }
-          >
-            {theme === "dark" ? "Light mode" : "Dark mode"}
-          </button>
-        </div>
+        <div className="auth-toolbar">{renderThemeToggle()}</div>
         <div className="auth-card">
           <p className="auth-eyebrow">StudyBuddy Planner</p>
           <h1>Restoring your workspace</h1>
@@ -458,19 +481,7 @@ function App() {
 
     return (
       <div className="auth-shell">
-        <div className="auth-toolbar">
-          <button
-            className="secondary-button theme-toggle"
-            type="button"
-            onClick={() =>
-              setTheme((currentTheme) =>
-                currentTheme === "dark" ? "light" : "dark",
-              )
-            }
-          >
-            {theme === "dark" ? "Light mode" : "Dark mode"}
-          </button>
-        </div>
+        <div className="auth-toolbar">{renderThemeToggle()}</div>
         <section className="auth-showcase">
           <p className="auth-eyebrow">StudyBuddy Planner</p>
           <h1>Private study planning for every semester sprint.</h1>
@@ -655,17 +666,7 @@ function App() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <button
-            className="secondary-button header-button theme-toggle"
-            type="button"
-            onClick={() =>
-              setTheme((currentTheme) =>
-                currentTheme === "dark" ? "light" : "dark",
-              )
-            }
-          >
-            {theme === "dark" ? "Light mode" : "Dark mode"}
-          </button>
+          {renderThemeToggle("header-button")}
           <button
             className="secondary-button header-button"
             type="button"

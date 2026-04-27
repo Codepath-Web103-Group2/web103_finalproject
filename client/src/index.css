@@ -162,6 +162,7 @@ body {
   grid-column: 1 / -1;
   display: flex;
   justify-content: flex-end;
+  margin-bottom: -6px;
 }
 
 .auth-eyebrow {
@@ -342,7 +343,115 @@ body {
 }
 
 .theme-toggle {
-  min-width: 118px;
+  min-width: 112px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--surface-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-strong) 82%, transparent);
+  box-shadow: 0 10px 26px rgba(16, 32, 51, 0.12);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.theme-toggle:hover {
+  background: color-mix(in srgb, var(--surface-strong) 92%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--surface-border));
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(16, 32, 51, 0.16);
+}
+
+.theme-toggle:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--input-focus) 24%, transparent),
+    0 14px 30px rgba(16, 32, 51, 0.16);
+}
+
+.theme-toggle-track {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffd27b, #ff9f67);
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
+
+:root[data-theme="dark"] .theme-toggle-track {
+  background: linear-gradient(135deg, #243a63, #0f1b31);
+}
+
+.theme-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 4px 10px rgba(16, 32, 51, 0.22);
+  transition: transform 0.2s ease;
+}
+
+:root[data-theme="dark"] .theme-toggle-thumb {
+  transform: translateX(20px);
+  background: #f2f6ff;
+}
+
+.theme-toggle-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--panel-subtle);
+  transition: color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+.theme-toggle-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.theme-toggle-icon:first-child {
+  color: #d98324;
+  opacity: 1;
+}
+
+.theme-toggle-icon:last-child {
+  opacity: 0.55;
+}
+
+.theme-toggle-icon:last-child svg {
+  fill: currentColor;
+  stroke: none;
+}
+
+:root[data-theme="dark"] .theme-toggle-icon:first-child {
+  color: var(--panel-subtle);
+  opacity: 0.55;
+}
+
+:root[data-theme="dark"] .theme-toggle-icon:last-child {
+  color: #dfe8ff;
+  opacity: 1;
+}
+
+.theme-toggle:hover .theme-toggle-icon:first-child,
+.theme-toggle:hover .theme-toggle-icon:last-child {
+  transform: scale(1.05);
 }
 
 .auth-secondary-actions {
@@ -415,6 +524,10 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .auth-toolbar {
+    margin-bottom: 0;
+  }
+
   .auth-card {
     justify-self: stretch;
     max-width: none;
@@ -422,6 +535,11 @@ body {
 
   .app-header {
     flex-direction: column;
+  }
+
+  .theme-toggle {
+    width: 100%;
+    justify-content: center;
   }
 }
 
