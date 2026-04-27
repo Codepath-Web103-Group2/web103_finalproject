@@ -258,12 +258,21 @@ body {
   align-items: flex-start;
   gap: 16px;
   margin-bottom: 32px;
+  flex-wrap: wrap;
 }
 
 .main-layout {
   display: grid;
   grid-template-columns: 1fr 1.3fr;
   gap: 24px;
+  align-items: start;
+}
+
+.task-form-column {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  min-width: 0;
 }
 
 .form-note {
@@ -271,6 +280,13 @@ body {
   margin-bottom: 16px;
   color: var(--panel-subtle);
   font-size: 0.95rem;
+}
+
+.task-form-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
 }
 
 .task-form {
@@ -487,6 +503,119 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 16px;
+}
+
+.task-form-mobile-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(9, 17, 31, 0.5);
+  backdrop-filter: blur(10px);
+  z-index: 110;
+}
+
+.task-form-mobile-sheet {
+  width: min(100%, 560px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: calc(100vh - 32px);
+}
+
+.mobile-task-form-close {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid color-mix(in srgb, var(--surface-border) 92%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface-strong) 88%, transparent);
+  color: var(--panel-text);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.mobile-task-form-close:hover {
+  background: color-mix(in srgb, var(--surface-strong) 96%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 22%, var(--surface-border));
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 10px 24px rgba(16, 32, 51, 0.14);
+}
+
+.mobile-task-form-close:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--input-focus) 24%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 10px 24px rgba(16, 32, 51, 0.14);
+}
+
+.floating-new-task-button {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #102033, #24456f);
+  color: #f8fbff;
+  font-size: 0.98rem;
+  font-weight: 700;
+  box-shadow: 0 18px 36px rgba(16, 32, 51, 0.28);
+  cursor: pointer;
+  z-index: 90;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.floating-new-task-button:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #17304e, #325c91);
+  box-shadow: 0 20px 40px rgba(16, 32, 51, 0.32);
+}
+
+.floating-new-task-button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--input-focus) 24%, transparent),
+    0 20px 40px rgba(16, 32, 51, 0.32);
+}
+
+.floating-new-task-button-icon {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+@media (min-width: 769px) {
+  .floating-new-task-button {
+    display: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .main-layout {
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  }
 }
 
 .task-card {
@@ -524,6 +653,19 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .app-container,
+  .auth-shell {
+    padding: 18px 14px 28px;
+  }
+
+  .task-form-column {
+    display: none;
+  }
+
+  .task-form-header-row {
+    flex-direction: column;
+  }
+
   .auth-toolbar {
     margin-bottom: 0;
   }
@@ -537,9 +679,111 @@ body {
     flex-direction: column;
   }
 
+  .header-right {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    gap: 6px;
+  }
+
+  .search-input {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
   .theme-toggle {
     width: 100%;
+    min-width: 0;
     justify-content: center;
+  }
+
+  .header-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .task-form-mobile-overlay {
+    display: flex;
+  }
+
+  .task-form-section,
+  .task-list-section,
+  .auth-card,
+  .auth-showcase {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .task-form,
+  .task-card-actions,
+  .filter-bar,
+  .header-right {
+    gap: 8px;
+  }
+
+  .auth-tabs {
+    width: 100%;
+  }
+
+  .auth-tabs button,
+  .task-form button,
+  .task-card-actions button,
+  .header-button {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+  }
+
+  .task-form input,
+  .task-form select,
+  .search-input,
+  .auth-form input {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+  }
+
+  .search-input {
+    height: 40px;
+  }
+
+  .theme-toggle {
+    min-width: 0;
+    padding: 8px 10px;
+  }
+
+  .theme-toggle-track {
+    width: 42px;
+    height: 24px;
+  }
+
+  .theme-toggle-thumb {
+    width: 18px;
+    height: 18px;
+  }
+
+  :root[data-theme="dark"] .theme-toggle-thumb {
+    transform: translateX(18px);
+  }
+
+  .filter-bar,
+  .task-card-actions,
+  .task-list-header,
+  .task-card-header {
+    flex-direction: column;
+  }
+
+  .filter-bar select,
+  .task-card-actions button {
+    width: 100%;
+  }
+
+  .floating-new-task-button {
+    right: 14px;
+    left: 14px;
+    bottom: 14px;
+    justify-content: center;
+    padding: 12px 14px;
+    font-size: 0.95rem;
   }
 }
 
@@ -625,9 +869,12 @@ body {
 }
 
 .header-right {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  flex-wrap: nowrap !important;
+  justify-content: flex-end !important;
+  flex: none !important;
 }
 
 .search-input {
@@ -635,7 +882,7 @@ body {
   border-radius: 8px;
   border: 1px solid var(--input-border);
   font-size: 0.95rem;
-  width: 300px;
+  width: min(100%, 300px);
   background: var(--surface-strong);
   color: var(--panel-text);
   height: 42px;
