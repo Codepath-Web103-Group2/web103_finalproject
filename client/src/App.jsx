@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TaskForm from "./components/TaskForm";
 import TaskList from "./components/TaskList";
 import "./index.css";
@@ -75,15 +75,36 @@ function App() {
   const [token, setToken] = useState(storedToken);
   const [user, setUser] = useState(storedUser);
   const [editingTask, setEditingTask] = useState(null);
+  const [isMobileTaskFormOpen, setIsMobileTaskFormOpen] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(
+    typeof window !== "undefined" ? window.innerWidth <= 768 : false,
+  );
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const taskFormRef = useRef(null);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     window.localStorage.setItem(themeStorageKey, theme);
   }, [theme]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobileViewport = window.innerWidth <= 768;
+      setIsMobileViewport(mobileViewport);
+
+      if (!mobileViewport) {
+        setIsMobileTaskFormOpen(false);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const isDarkTheme = theme === "dark";
 
@@ -126,7 +147,26 @@ function App() {
     setUser(null);
     setTasks([]);
     setEditingTask(null);
+    setIsMobileTaskFormOpen(false);
     setAuthMode("login");
+  };
+
+  const openTaskForm = (task = null) => {
+    setEditingTask(task);
+
+    if (isMobileViewport) {
+      setIsMobileTaskFormOpen(true);
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      taskFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
+  const closeMobileTaskForm = () => {
+    setIsMobileTaskFormOpen(false);
+    setEditingTask(null);
   };
 
   useEffect(() => {
@@ -358,6 +398,7 @@ function App() {
       }
 
       setTasks((prev) => [data, ...prev]);
+      setIsMobileTaskFormOpen(false);
     } catch (error) {
       setErrorMessage(error.message || "Unable to create task.");
       throw error;
@@ -394,6 +435,7 @@ function App() {
         prev.map((task) => (task.id === data.id ? data : task)),
       );
       setEditingTask(null);
+      setIsMobileTaskFormOpen(false);
     } catch (error) {
       setErrorMessage(error.message || "Unable to update task.");
       throw error;
@@ -455,6 +497,7 @@ function App() {
 
       if (editingTask?.id === taskId) {
         setEditingTask(null);
+        setIsMobileTaskFormOpen(false);
       }
     } catch (error) {
       setErrorMessage(error.message || "Unable to delete task.");
@@ -672,31 +715,66 @@ function App() {
             type="button"
             onClick={handleLogout}
           >
-            Log Out
+            Logout
           </button>
         </div>
       </header>
 
       <main className="main-layout">
-        <TaskForm
-          key={editingTask?.id || "new-task"}
-          editingTask={editingTask}
-          isSaving={isSaving}
-          onCancelEdit={() => setEditingTask(null)}
-          onCreateTask={handleCreateTask}
-          onUpdateTask={handleUpdateTask}
-        />
+        <div ref={taskFormRef} className="task-form-column">
+          <TaskForm
+            key={editingTask?.id || "new-task"}
+            editingTask={editingTask}
+            isSaving={isSaving}
+            onCancelEdit={() => setEditingTask(null)}
+            onCreateTask={handleCreateTask}
+            onUpdateTask={handleUpdateTask}
+          />
+        </div>
         <TaskList
           errorMessage={errorMessage}
           isLoading={isLoading}
           onDeleteTask={handleDeleteTask}
-          onEditTask={setEditingTask}
+          onEditTask={openTaskForm}
           onToggleComplete={handleToggleComplete}
           tasks={tasks}
           user={user}
           searchQuery={searchQuery}
         />
       </main>
+
+      {isMobileTaskFormOpen ? (
+        <div className="task-form-mobile-overlay" role="presentation">
+          <div className="task-form-mobile-sheet">
+            <TaskForm
+              key={`mobile-${editingTask?.id || "new-task"}`}
+              editingTask={editingTask}
+              isSaving={isSaving}
+              onCancelEdit={closeMobileTaskForm}
+              onCreateTask={handleCreateTask}
+              onUpdateTask={handleUpdateTask}
+            />
+            <button
+              className="secondary-button mobile-task-form-close"
+              type="button"
+              onClick={closeMobileTaskForm}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      <button
+        className="floating-new-task-button"
+        type="button"
+        onClick={() => openTaskForm()}
+      >
+        <span className="floating-new-task-button-icon" aria-hidden="true">
+          +
+        </span>
+        <span>New Task</span>
+      </button>
     </div>
   );
 }
