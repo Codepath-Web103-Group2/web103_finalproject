@@ -1,6 +1,32 @@
 import { useEffect, useState } from "react";
 
 const PRIORITY_LABEL = { high: "🔴 High", medium: "🟡 Medium", low: "🟢 Low" };
+const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 };
+
+function compareTasks(a, b, sortOrder) {
+  switch (sortOrder) {
+    case "priority-high-low":
+      return (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1);
+    case "priority-low-high":
+      return (PRIORITY_ORDER[b.priority] ?? 1) - (PRIORITY_ORDER[a.priority] ?? 1);
+    case "deadline-soonest": {
+      const aTime = a.deadline ? new Date(a.deadline).getTime() : Infinity;
+      const bTime = b.deadline ? new Date(b.deadline).getTime() : Infinity;
+      return aTime - bTime;
+    }
+    case "deadline-overdue": {
+      const aTime = a.deadline ? new Date(a.deadline).getTime() : -Infinity;
+      const bTime = b.deadline ? new Date(b.deadline).getTime() : -Infinity;
+      return bTime - aTime;
+    }
+    case "title-az":
+      return (a.title || "").localeCompare(b.title || "");
+    case "title-za":
+      return (b.title || "").localeCompare(a.title || "");
+    default:
+      return 0;
+  }
+}
 
 function getDeadlineTimestamp(deadline) {
   if (!deadline) {
@@ -68,6 +94,7 @@ function TaskList({
 }) {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterPriority, setFilterPriority] = useState("all");
+  const [sortOrder, setSortOrder] = useState("none");
   const [currentTime, setCurrentTime] = useState(() => Date.now());
 
   useEffect(() => {
@@ -90,6 +117,11 @@ function TaskList({
       (t.description || "").toLowerCase().includes(searchQuery.toLowerCase());
     return statusOk && priorityOk && searchOk;
   });
+
+  const sorted =
+    sortOrder === "none"
+      ? filtered
+      : [...filtered].sort((a, b) => compareTasks(a, b, sortOrder));
 
   const completedCount = tasks.filter((t) => t.completed).length;
   const progress = tasks.length
@@ -149,15 +181,27 @@ function TaskList({
           <option value="medium">🟡 Medium</option>
           <option value="low">🟢 Low</option>
         </select>
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+        >
+          <option value="none">Sort By</option>
+          <option value="priority-high-low">Priority (High → Low)</option>
+          <option value="priority-low-high">Priority (Low → High)</option>
+          <option value="deadline-soonest">Deadline (Soonest → Overdue)</option>
+          <option value="deadline-overdue">Deadline (Overdue → Soonest)</option>
+          <option value="title-az">Title (A → Z)</option>
+          <option value="title-za">Title (Z → A)</option>
+        </select>
       </div>
 
       {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
       {isLoading ? <p className="empty-message">Loading tasks...</p> : null}
-      {!isLoading && filtered.length === 0 ? (
+      {!isLoading && sorted.length === 0 ? (
         <p className="empty-message">No tasks found.</p>
       ) : (
         <div className="task-list">
-          {filtered.map((task) => {
+          {sorted.map((task) => {
             const countdown = getCountdownState(task.deadline, currentTime);
 
             return (
