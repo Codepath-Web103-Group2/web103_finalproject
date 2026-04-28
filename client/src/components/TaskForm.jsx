@@ -1,10 +1,12 @@
 import { useState } from "react";
+import TagSelector from "./TagSelector";
 
 const emptyTask = {
   title: "",
   description: "",
   deadline: "",
   priority: "medium",
+  tags: [],
 };
 
 function TaskForm({
@@ -13,6 +15,7 @@ function TaskForm({
   onCancelEdit,
   onCreateTask,
   onUpdateTask,
+  token,
 }) {
   const initialTask = editingTask || emptyTask;
   const [title, setTitle] = useState(initialTask.title || "");
@@ -21,6 +24,9 @@ function TaskForm({
   );
   const [deadline, setDeadline] = useState(initialTask.deadline || "");
   const [priority, setPriority] = useState(initialTask.priority || "medium");
+  const [selectedTagIds, setSelectedTagIds] = useState(
+    initialTask.tags?.map((t) => t.id) || []
+  );
   const [formError, setFormError] = useState("");
 
   const resetForm = () => {
@@ -28,6 +34,7 @@ function TaskForm({
     setDescription("");
     setDeadline("");
     setPriority("medium");
+    setSelectedTagIds([]);
     setFormError("");
   };
 
@@ -42,6 +49,7 @@ function TaskForm({
       description: description.trim(),
       deadline,
       priority,
+      tagIds: selectedTagIds,
     };
     try {
       if (editingTask) {
@@ -52,9 +60,7 @@ function TaskForm({
       resetForm();
     } catch {
       setFormError(
-        editingTask
-          ? "Unable to update task right now."
-          : "Unable to save task right now.",
+        editingTask ? "Unable to update task right now." : "Unable to save task right now.",
       );
     }
   };
@@ -97,6 +103,15 @@ function TaskForm({
           <option value="medium">🟡 Medium Priority</option>
           <option value="low">🟢 Low Priority</option>
         </select>
+
+        {token && (
+          <TagSelector
+            token={token}
+            selectedTagIds={selectedTagIds}
+            onChange={setSelectedTagIds}
+          />
+        )}
+
         {formError ? <p className="form-error">{formError}</p> : null}
         <div className="task-form-actions">
           <button type="submit" disabled={isSaving}>

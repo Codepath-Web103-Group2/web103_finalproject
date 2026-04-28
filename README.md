@@ -4,7 +4,7 @@ CodePath WEB103 Final Project
 
 Designed and developed by: Group 2 - Web 103 Final Project
 
-🔗 Link to deployed app: https://studybuddyplanner.vercel.app/
+🔗 Link to deployed app: https://studybuddy-frontend-qmc6.onrender.com
 
 ## Group Members
 
@@ -32,9 +32,9 @@ Frontend: React, React Router, CSS
 
 Backend: Node.js, Express.js
 
-Database: PostgreSQL
+Database: PostgreSQL (Neon)
 
-Deployment: Vercel
+Deployment: Render
 
 ## Features
 
@@ -42,15 +42,17 @@ Deployment: Vercel
 
 ![Full Demo](./planning/images/Final-demo.gif)
 
-- ✅ **Create a new task** – users can add a study task with a title and due date
-- ✅ **Edit a task** – users can update existing task information
-- ✅ **Delete a task** – users can remove tasks they no longer need
-- ✅ **Mark task as completed** – users can track finished work
-- ✅ **Assign priority levels** – users can label tasks as high, medium, or low priority
-- ✅ **Filter tasks by priority or status** – users can focus on specific tasks using dropdown filters.
-- ✅ **Track completion progress** – users can monitor their overall study progress
+- ✅ **Create a new task** – users can add a study task with a title, description, priority, and due date
+- ✅ **Edit a task** – users can update existing task information including title, description, deadline, and priority
+- ✅ **Delete a task** – users can remove tasks they no longer need (with confirmation prompt)
+- ✅ **Mark task as completed** – users can toggle tasks between Pending and Completed to track finished work
+- ✅ **Assign priority levels** – users can label tasks as high, medium, or low priority when creating or editing
+- ✅ **Filter tasks by priority or status** – users can focus on specific tasks using dropdown filters
+- ✅ **Track completion progress** – users can monitor their overall study progress via a progress bar showing percentage of completed tasks
 - ✅ **User Authentication** – secure login/register allows personalized, private task management across sessions
-- ✅ **Search Functionality** – quickly find tasks by keywords or dates, useful for students managing large lists
+- ✅ **Search Functionality** – users can quickly find tasks by typing keywords in the search bar in the navigation header
+- ✅ **Tags** – users can create color-coded tags and assign multiple tags to tasks for flexible organization (many-to-many relationship)
+- ✅ **View Task Detail** – users can navigate to a dedicated page for each task showing full details via dynamic routes
 
 ### Additional Possible Features
 
@@ -62,38 +64,57 @@ Deployment: Vercel
 ## Installation Instructions
 
 1. Clone the repository:
+
+   ```
    git clone <your-repo-url>
+   ```
 
 2. Navigate into the project folder:
-   cd <repo-name>
 
-3. Create your environment file:
-  Copy `.env.example` to `.env` and replace the placeholder values.
-  Example JWT secret format:
-  `JWT_SECRET="replace-with-a-long-random-secret-like-studybuddy-2026-dev-secret-key"`
-  For password reset emails, configure the SMTP settings in `.env`.
-  If SMTP is not configured, the app returns a development preview reset link instead.
+   ```
+   cd web103_finalproject
+   ```
 
-4. Install frontend dependencies:
+3. Create your environment file — copy `.env.example` to `.env` and fill in your values:
+
+   ```
+   PORT=3001
+   PGDATABASE=neondb
+   PGHOST=your-neon-host
+   PGPASSWORD=your-neon-password
+   PGPORT=5432
+   PGUSER=neondb_owner
+   PGSSLMODE=require
+   JWT_SECRET=your-jwt-secret
+   ```
+
+4. Install backend dependencies:
+
+   ```
+   cd server
+   npm install
+   ```
+
+5. (Optional) Reset the database to its default state:
+
+   ```
+   node reset.js
+   ```
+
+6. Start the backend server:
+
+   ```
+   npm start
+   ```
+
+7. In a new terminal, install and start the frontend:
+   ```
    cd client
    npm install
+   npm run dev
+   ```
 
-5. Install backend dependencies:
-   cd ../server
-   npm install
+## Render Deployment
 
-6. Start the frontend and backend servers:
-  Frontend: `cd client && npm run dev`
-  Backend: `cd server && npm start`
-
-## Vercel Deployment
-
-1. Import the repository into Vercel with the project root set to `web103_finalproject`.
-2. Keep the default install command: `npm install`.
-3. Keep the build command: `npm run build`.
-4. Vercel will use `client/dist` as the output directory via `vercel.json`.
-5. Add the environment variables from `.env` in Vercel project settings:
-  `PGDATABASE`, `PGHOST`, `PGPASSWORD`, `PGPORT`, `PGUSER`, `PGSSLMODE`, `JWT_SECRET`, `APP_BASE_URL`, and any SMTP variables needed for production email delivery.
-6. Redeploy after saving the environment variables.
-
-Project structure and setup steps will be updated as development begins in later milestones.
+- **Backend:** https://studybuddy-backend-ksac.onrender.com
+- **Frontend:** https://studybuddy-frontend-qmc6.onrender.com
