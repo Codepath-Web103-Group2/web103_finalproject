@@ -5,6 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { ensureDatabaseSchema } from "./config/database.js";
 import authRouter from "./routes/auth.js";
+import tagsRouter from "./routes/tags.js";
 import tasksRouter from "./routes/tasks.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +30,7 @@ app.get("/api/health", (_request, response) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/tasks", tasksRouter);
+app.use("/api/tags", tagsRouter);
 
 app.use((error, _request, response, _next) => {
   console.error(error);
@@ -39,7 +41,6 @@ export function prepareApp() {
   if (!preparedAppPromise) {
     preparedAppPromise = ensureDatabaseSchema();
   }
-
   return preparedAppPromise;
 }
 

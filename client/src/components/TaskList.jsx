@@ -3,10 +3,7 @@ import { useEffect, useState } from "react";
 const PRIORITY_LABEL = { high: "🔴 High", medium: "🟡 Medium", low: "🟢 Low" };
 
 function getDeadlineTimestamp(deadline) {
-  if (!deadline) {
-    return null;
-  }
-
+  if (!deadline) return null;
   const deadlineDate = new Date(`${deadline}T23:59:59`);
   return Number.isNaN(deadlineDate.getTime()) ? null : deadlineDate.getTime();
 }
@@ -17,43 +14,22 @@ function formatDuration(milliseconds) {
   const hours = Math.floor((totalSeconds % 86400) / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
-
   const segments = [];
-
-  if (days > 0) {
-    segments.push(`${days}d`);
-  }
-
+  if (days > 0) segments.push(`${days}d`);
   segments.push(`${String(hours).padStart(2, "0")}h`);
   segments.push(`${String(minutes).padStart(2, "0")}m`);
   segments.push(`${String(seconds).padStart(2, "0")}s`);
-
   return segments.join(" ");
 }
 
 function getCountdownState(deadline, now) {
   const deadlineTimestamp = getDeadlineTimestamp(deadline);
-
-  if (!deadlineTimestamp) {
-    return {
-      isExpired: false,
-      label: "Timer unavailable",
-    };
-  }
-
+  if (!deadlineTimestamp) return { isExpired: false, label: "Timer unavailable" };
   const remainingMilliseconds = deadlineTimestamp - now;
-
   if (remainingMilliseconds < 0) {
-    return {
-      isExpired: true,
-      label: `Lapsed by ${formatDuration(Math.abs(remainingMilliseconds))}`,
-    };
+    return { isExpired: true, label: `Lapsed by ${formatDuration(Math.abs(remainingMilliseconds))}` };
   }
-
-  return {
-    isExpired: false,
-    label: `${formatDuration(remainingMilliseconds)} left`,
-  };
+  return { isExpired: false, label: `${formatDuration(remainingMilliseconds)} left` };
 }
 
 function TaskList({
@@ -69,38 +45,41 @@ function TaskList({
 }) {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterPriority, setFilterPriority] = useState("all");
+  const [filterTag, setFilterTag] = useState("all");
   const [currentTime, setCurrentTime] = useState(() => Date.now());
 
   useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 1000);
-
+    const intervalId = window.setInterval(() => setCurrentTime(Date.now()), 1000);
     return () => window.clearInterval(intervalId);
   }, []);
 
+  // Get all unique tags from tasks
+  const allTags = [];
+  const tagIds = new Set();
+  for (const task of tasks) {
+    for (const tag of task.tags || []) {
+      if (!tagIds.has(tag.id)) {
+        tagIds.add(tag.id);
+        allTags.push(tag);
+      }
+    }
+  }
+
   const filtered = tasks.filter((t) => {
-    const statusOk =
-      filterStatus === "all" ||
-      (filterStatus === "completed" ? t.completed : !t.completed);
-    const priorityOk =
-      filterPriority === "all" || t.priority === filterPriority;
-    const searchOk =
-      !searchQuery ||
+    const statusOk = filterStatus === "all" || (filterStatus === "completed" ? t.completed : !t.completed);
+    const priorityOk = filterPriority === "all" || t.priority === filterPriority;
+    const tagOk = filterTag === "all" || (t.tags || []).some((tag) => String(tag.id) === filterTag);
+    const searchOk = !searchQuery ||
       t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (t.description || "").toLowerCase().includes(searchQuery.toLowerCase());
-    return statusOk && priorityOk && searchOk;
+    return statusOk && priorityOk && tagOk && searchOk;
   });
 
   const completedCount = tasks.filter((t) => t.completed).length;
-  const progress = tasks.length
-    ? Math.round((completedCount / tasks.length) * 100)
-    : 0;
+  const progress = tasks.length ? Math.round((completedCount / tasks.length) * 100) : 0;
 
   const handleDelete = (taskId, taskTitle) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${taskTitle}"?`,
-    );
+    const confirmed = window.confirm(`Are you sure you want to delete "${taskTitle}"?`);
     if (confirmed) onDeleteTask(taskId);
   };
 
@@ -120,36 +99,33 @@ function TaskList({
 
       {tasks.length > 0 && (
         <div className="progress-bar-container">
-          <p className="progress-label">
-            {completedCount}/{tasks.length} completed ({progress}%)
-          </p>
+          <p className="progress-label">{completedCount}/{tasks.length} completed ({progress}%)</p>
           <div className="progress-bar-bg">
-            <div
-              className="progress-bar-fill"
-              style={{ width: `${progress}%` }}
-            />
+            <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
           </div>
         </div>
       )}
 
       <div className="filter-bar">
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-        >
+        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
           <option value="all">All Status</option>
           <option value="pending">Pending</option>
           <option value="completed">Completed</option>
         </select>
-        <select
-          value={filterPriority}
-          onChange={(e) => setFilterPriority(e.target.value)}
-        >
+        <select value={filterPriority} onChange={(e) => setFilterPriority(e.target.value)}>
           <option value="all">All Priority</option>
           <option value="high">🔴 High</option>
           <option value="medium">🟡 Medium</option>
           <option value="low">🟢 Low</option>
         </select>
+        {allTags.length > 0 && (
+          <select value={filterTag} onChange={(e) => setFilterTag(e.target.value)}>
+            <option value="all">All Tags</option>
+            {allTags.map((tag) => (
+              <option key={tag.id} value={String(tag.id)}>{tag.name}</option>
+            ))}
+          </select>
+        )}
       </div>
 
       {errorMessage ? <p className="form-error">{errorMessage}</p> : null}
@@ -160,52 +136,45 @@ function TaskList({
         <div className="task-list">
           {filtered.map((task) => {
             const countdown = getCountdownState(task.deadline, currentTime);
-
             return (
-              <div
-                className={`task-card ${task.completed ? "task-completed" : ""}`}
-                key={task.id}
-              >
+              <div className={`task-card ${task.completed ? "task-completed" : ""}`} key={task.id}>
                 <div className="task-card-header">
                   <h3>{task.title}</h3>
                   <span className={`priority-badge priority-${task.priority}`}>
                     {PRIORITY_LABEL[task.priority] || task.priority}
                   </span>
                 </div>
-                <p>
-                  <strong>Description:</strong>{" "}
-                  {task.description || task.subject}
-                </p>
-                <p>
-                  <strong>Deadline:</strong> {task.deadline}
-                </p>
-                <p
-                  className={`task-timer ${countdown.isExpired ? "task-timer-expired" : ""}`}
-                >
+
+                {/* Tags */}
+                {task.tags && task.tags.length > 0 && (
+                  <div className="task-tags">
+                    {task.tags.map((tag) => (
+                      <span
+                        key={tag.id}
+                        className="tag-badge tag-selected"
+                        style={{ backgroundColor: tag.color, color: "#fff", borderColor: tag.color }}
+                      >
+                        {tag.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <p><strong>Description:</strong> {task.description || task.subject}</p>
+                <p><strong>Deadline:</strong> {task.deadline}</p>
+                <p className={`task-timer ${countdown.isExpired ? "task-timer-expired" : ""}`}>
                   <strong>Time Remaining:</strong> {countdown.label}
                 </p>
-                <p>
-                  <strong>Status:</strong>{" "}
-                  {task.completed ? "✅ Completed" : "⏳ Pending"}
-                </p>
+                <p><strong>Status:</strong>{" "}{task.completed ? "✅ Completed" : "⏳ Pending"}</p>
                 <div className="task-card-actions">
                   <button type="button" onClick={() => onToggleComplete(task)}>
                     {task.completed ? "Mark Pending" : "Mark Complete"}
                   </button>
-                  <button type="button" onClick={() => handleEdit(task)}>
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onViewDetail && onViewDetail(task)}
-                  >
+                  <button type="button" onClick={() => handleEdit(task)}>Edit</button>
+                  <button type="button" onClick={() => onViewDetail && onViewDetail(task)}>
                     View Detail
                   </button>
-                  <button
-                    className="secondary-button"
-                    type="button"
-                    onClick={() => handleDelete(task.id, task.title)}
-                  >
+                  <button className="secondary-button" type="button" onClick={() => handleDelete(task.id, task.title)}>
                     Delete
                   </button>
                 </div>
