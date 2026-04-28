@@ -65,6 +65,7 @@ function TaskList({
   tasks,
   user,
   searchQuery,
+  onViewDetail,
 }) {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterPriority, setFilterPriority] = useState("all");
@@ -172,7 +173,8 @@ function TaskList({
                   </span>
                 </div>
                 <p>
-                  <strong>Description:</strong> {task.description || task.subject}
+                  <strong>Description:</strong>{" "}
+                  {task.description || task.subject}
                 </p>
                 <p>
                   <strong>Deadline:</strong> {task.deadline}
@@ -192,6 +194,12 @@ function TaskList({
                   </button>
                   <button type="button" onClick={() => handleEdit(task)}>
                     Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onViewDetail && onViewDetail(task)}
+                  >
+                    View Detail
                   </button>
                   <button
                     className="secondary-button"

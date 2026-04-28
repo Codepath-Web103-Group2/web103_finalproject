@@ -35,7 +35,9 @@ function getInitialTheme() {
   if (typeof window === "undefined") return "light";
   const storedTheme = window.localStorage.getItem(themeStorageKey);
   if (storedTheme === "light" || storedTheme === "dark") return storedTheme;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 }
 
 function AuthPage({ onLogin }) {
@@ -44,7 +46,9 @@ function AuthPage({ onLogin }) {
   const initialResetMode = initialUrl.searchParams.get("mode") === "reset";
 
   const [theme, setTheme] = useState(getInitialTheme);
-  const [authMode, setAuthMode] = useState(initialResetMode ? "reset" : "login");
+  const [authMode, setAuthMode] = useState(
+    initialResetMode ? "reset" : "login",
+  );
   const [authForm, setAuthForm] = useState({
     fullName: "",
     email: initialUrl.searchParams.get("email") || "",
@@ -67,7 +71,9 @@ function AuthPage({ onLogin }) {
 
   const renderThemeToggle = (className = "") => (
     <button
-      className={["secondary-button", "theme-toggle", className].filter(Boolean).join(" ")}
+      className={["secondary-button", "theme-toggle", className]
+        .filter(Boolean)
+        .join(" ")}
       type="button"
       onClick={toggleTheme}
       aria-label={`Switch to ${isDarkTheme ? "light" : "dark"} mode`}
@@ -131,12 +137,23 @@ function AuthPage({ onLogin }) {
 
       const requestBodyByMode = {
         login: { email: authForm.email, password: authForm.password },
-        signup: { fullName: authForm.fullName, email: authForm.email, password: authForm.password },
+        signup: {
+          fullName: authForm.fullName,
+          email: authForm.email,
+          password: authForm.password,
+        },
         forgot: { email: authForm.email },
-        reset: { email: authForm.email, password: authForm.password, token: authForm.token },
+        reset: {
+          email: authForm.email,
+          password: authForm.password,
+          token: authForm.token,
+        },
       };
 
-      if (authMode === "reset" && authForm.password !== authForm.confirmPassword) {
+      if (
+        authMode === "reset" &&
+        authForm.password !== authForm.confirmPassword
+      ) {
         throw new Error("Passwords do not match.");
       }
 
@@ -150,14 +167,22 @@ function AuthPage({ onLogin }) {
       if (!response.ok) throw new Error(data.error || `Unable to ${authMode}.`);
 
       if (authMode === "forgot") {
-        setAuthMessage(data.message || "If an account matches that email, a reset link has been sent.");
+        setAuthMessage(
+          data.message ||
+            "If an account matches that email, a reset link has been sent.",
+        );
         setPreviewResetUrl(data.previewResetUrl || "");
         return;
       }
 
       if (authMode === "reset") {
         setAuthMessage(data.message || "Password updated successfully.");
-        setAuthForm((prev) => ({ ...prev, password: "", confirmPassword: "", token: "" }));
+        setAuthForm((prev) => ({
+          ...prev,
+          password: "",
+          confirmPassword: "",
+          token: "",
+        }));
         switchAuthMode("login");
         return;
       }
@@ -183,7 +208,8 @@ function AuthPage({ onLogin }) {
         <p className="auth-eyebrow">StudyBuddy Planner</p>
         <h1>Private study planning for every semester sprint.</h1>
         <p className="auth-subtitle">
-          Create an account to keep your assignments, deadlines, and priorities tied to your own workspace.
+          Create an account to keep your assignments, deadlines, and priorities
+          tied to your own workspace.
         </p>
         <div className="auth-highlights">
           <div>
@@ -203,53 +229,134 @@ function AuthPage({ onLogin }) {
 
       <section className="auth-card">
         {!isForgot && !isReset ? (
-          <div className="auth-tabs" role="tablist" aria-label="Authentication options">
-            <button type="button" className={authMode === "login" ? "active" : ""} onClick={() => switchAuthMode("login")}>Login</button>
-            <button type="button" className={authMode === "signup" ? "active" : ""} onClick={() => switchAuthMode("signup")}>Sign Up</button>
+          <div
+            className="auth-tabs"
+            role="tablist"
+            aria-label="Authentication options"
+          >
+            <button
+              type="button"
+              className={authMode === "login" ? "active" : ""}
+              onClick={() => switchAuthMode("login")}
+            >
+              Login
+            </button>
+            <button
+              type="button"
+              className={authMode === "signup" ? "active" : ""}
+              onClick={() => switchAuthMode("signup")}
+            >
+              Sign Up
+            </button>
           </div>
         ) : null}
 
         <h2>
-          {isSignup ? "Create your account" : isForgot ? "Reset your password" : isReset ? "Choose a new password" : "Welcome back"}
+          {isSignup
+            ? "Create your account"
+            : isForgot
+              ? "Reset your password"
+              : isReset
+                ? "Choose a new password"
+                : "Welcome back"}
         </h2>
         <p className="form-note">
-          {isSignup ? "Set up your planner account to keep tasks private and persistent."
-            : isForgot ? "Enter your email and we will send you a reset link."
-            : isReset ? "Set a new password for your account using the reset link you opened."
-            : "Log in to view and manage your study tasks."}
+          {isSignup
+            ? "Set up your planner account to keep tasks private and persistent."
+            : isForgot
+              ? "Enter your email and we will send you a reset link."
+              : isReset
+                ? "Set a new password for your account using the reset link you opened."
+                : "Log in to view and manage your study tasks."}
         </p>
 
         <form className="task-form auth-form" onSubmit={handleAuthSubmit}>
           {isSignup ? (
-            <input type="text" name="fullName" placeholder="Full name" value={authForm.fullName} onChange={handleAuthInputChange} required />
+            <input
+              type="text"
+              name="fullName"
+              placeholder="Full name"
+              value={authForm.fullName}
+              onChange={handleAuthInputChange}
+              required
+            />
           ) : null}
-          <input type="email" name="email" placeholder="Email address" value={authForm.email} onChange={handleAuthInputChange} readOnly={isReset} required />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email address"
+            value={authForm.email}
+            onChange={handleAuthInputChange}
+            readOnly={isReset}
+            required
+          />
           {!isForgot ? (
-            <input type="password" name="password" placeholder={isReset ? "New password" : "Password"} value={authForm.password} onChange={handleAuthInputChange} minLength={8} required />
+            <input
+              type="password"
+              name="password"
+              placeholder={isReset ? "New password" : "Password"}
+              value={authForm.password}
+              onChange={handleAuthInputChange}
+              minLength={8}
+              required
+            />
           ) : null}
           {isReset ? (
-            <input type="password" name="confirmPassword" placeholder="Confirm new password" value={authForm.confirmPassword} onChange={handleAuthInputChange} required />
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirm new password"
+              value={authForm.confirmPassword}
+              onChange={handleAuthInputChange}
+              required
+            />
           ) : null}
 
           {authError ? <p className="form-error">{authError}</p> : null}
           {authMessage ? <p className="form-success">{authMessage}</p> : null}
           {previewResetUrl ? (
-            <a className="auth-link-preview" href={previewResetUrl}>Open development reset link</a>
+            <a className="auth-link-preview" href={previewResetUrl}>
+              Open development reset link
+            </a>
           ) : null}
 
           <button type="submit" disabled={isAuthenticating}>
             {isAuthenticating
-              ? isSignup ? "Creating account..." : isForgot ? "Sending reset link..." : isReset ? "Updating password..." : "Signing in..."
-              : isSignup ? "Create Account" : isForgot ? "Send Reset Link" : isReset ? "Save New Password" : "Log In"}
+              ? isSignup
+                ? "Creating account..."
+                : isForgot
+                  ? "Sending reset link..."
+                  : isReset
+                    ? "Updating password..."
+                    : "Signing in..."
+              : isSignup
+                ? "Create Account"
+                : isForgot
+                  ? "Send Reset Link"
+                  : isReset
+                    ? "Save New Password"
+                    : "Log In"}
           </button>
         </form>
 
         <div className="auth-secondary-actions">
           {authMode === "login" ? (
-            <button type="button" className="auth-link-button" onClick={() => switchAuthMode("forgot")}>Forgot password?</button>
+            <button
+              type="button"
+              className="auth-link-button"
+              onClick={() => switchAuthMode("forgot")}
+            >
+              Forgot password?
+            </button>
           ) : null}
           {isForgot || isReset ? (
-            <button type="button" className="auth-link-button" onClick={() => switchAuthMode("login")}>Back to login</button>
+            <button
+              type="button"
+              className="auth-link-button"
+              onClick={() => switchAuthMode("login")}
+            >
+              Back to login
+            </button>
           ) : null}
         </div>
       </section>
@@ -297,7 +404,8 @@ function DashboardPage({ token, user, onLogout }) {
         const response = await fetch(`${API_BASE}/api/tasks`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (response.status === 401) throw new Error("Your session has expired. Please log in again.");
+        if (response.status === 401)
+          throw new Error("Your session has expired. Please log in again.");
         if (!response.ok) throw new Error("Unable to load tasks.");
         const data = await response.json();
         setTasks(data);
@@ -317,7 +425,9 @@ function DashboardPage({ token, user, onLogout }) {
 
   const renderThemeToggle = (className = "") => (
     <button
-      className={["secondary-button", "theme-toggle", className].filter(Boolean).join(" ")}
+      className={["secondary-button", "theme-toggle", className]
+        .filter(Boolean)
+        .join(" ")}
       type="button"
       onClick={toggleTheme}
       aria-label={`Switch to ${isDarkTheme ? "light" : "dark"} mode`}
@@ -347,7 +457,10 @@ function DashboardPage({ token, user, onLogout }) {
       return;
     }
     requestAnimationFrame(() => {
-      taskFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      taskFormRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     });
   };
 
@@ -362,7 +475,10 @@ function DashboardPage({ token, user, onLogout }) {
     try {
       const response = await fetch(`${API_BASE}/api/tasks`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(taskDetails),
       });
       const data = await response.json();
@@ -384,12 +500,17 @@ function DashboardPage({ token, user, onLogout }) {
     try {
       const response = await fetch(`${API_BASE}/api/tasks/${editingTask.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(taskDetails),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Unable to update task.");
-      setTasks((prev) => prev.map((task) => (task.id === data.id ? data : task)));
+      setTasks((prev) =>
+        prev.map((task) => (task.id === data.id ? data : task)),
+      );
       setEditingTask(null);
       setIsMobileTaskFormOpen(false);
     } catch (error) {
@@ -405,7 +526,10 @@ function DashboardPage({ token, user, onLogout }) {
     try {
       const response = await fetch(`${API_BASE}/api/tasks/${task.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           title: task.title,
           description: task.description,
@@ -434,7 +558,7 @@ function DashboardPage({ token, user, onLogout }) {
         try {
           const data = await response.json();
           errorMessageFromServer = data.error || errorMessageFromServer;
-        } catch { }
+        } catch {}
         throw new Error(errorMessageFromServer);
       }
       setTasks((prev) => prev.filter((task) => task.id !== taskId));
@@ -453,7 +577,9 @@ function DashboardPage({ token, user, onLogout }) {
         <div>
           <p className="auth-eyebrow">StudyBuddy Planner</p>
           <h1>{user.fullName.split(" ")[0]}'s Dashboard</h1>
-          <p className="auth-subtitle">Plan your study tasks and keep them attached to your account.</p>
+          <p className="auth-subtitle">
+            Plan your study tasks and keep them attached to your account.
+          </p>
         </div>
         <div className="header-right">
           <input
@@ -464,7 +590,11 @@ function DashboardPage({ token, user, onLogout }) {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           {renderThemeToggle("header-button")}
-          <button className="secondary-button header-button" type="button" onClick={onLogout}>
+          <button
+            className="secondary-button header-button"
+            type="button"
+            onClick={onLogout}
+          >
             Logout
           </button>
         </div>
@@ -505,15 +635,25 @@ function DashboardPage({ token, user, onLogout }) {
               onCreateTask={handleCreateTask}
               onUpdateTask={handleUpdateTask}
             />
-            <button className="secondary-button mobile-task-form-close" type="button" onClick={closeMobileTaskForm}>
+            <button
+              className="secondary-button mobile-task-form-close"
+              type="button"
+              onClick={closeMobileTaskForm}
+            >
               Close
             </button>
           </div>
         </div>
       ) : null}
 
-      <button className="floating-new-task-button" type="button" onClick={() => openTaskForm()}>
-        <span className="floating-new-task-button-icon" aria-hidden="true">+</span>
+      <button
+        className="floating-new-task-button"
+        type="button"
+        onClick={() => openTaskForm()}
+      >
+        <span className="floating-new-task-button-icon" aria-hidden="true">
+          +
+        </span>
         <span>New Task</span>
       </button>
     </div>
@@ -524,7 +664,9 @@ function App() {
   const [{ token: storedToken, user: storedUser }] = useState(getStoredSession);
   const [token, setToken] = useState(storedToken);
   const [user, setUser] = useState(storedUser);
-  const [isCheckingSession, setIsCheckingSession] = useState(Boolean(storedToken));
+  const [isCheckingSession, setIsCheckingSession] = useState(
+    Boolean(storedToken),
+  );
 
   useEffect(() => {
     const restoreSession = async () => {
@@ -578,17 +720,57 @@ function App() {
     <Routes>
       <Route
         path="/"
-        element={token && user ? <Navigate to="/dashboard" replace /> : <AuthPage onLogin={handleLogin} />}
+        element={
+          token && user ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <AuthPage onLogin={handleLogin} />
+          )
+        }
       />
       <Route
         path="/dashboard"
-        element={token && user ? <DashboardPage token={token} user={user} onLogout={handleLogout} /> : <Navigate to="/" replace />}
+        element={
+          token && user ? (
+            <DashboardPage token={token} user={user} onLogout={handleLogout} />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
       />
       <Route
         path="/tasks/:id"
-        element={token && user
-          ? <TaskDetail token={token} onDeleteTask={async (id) => { await fetch(`${API_BASE}/api/tasks/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }); }} onToggleComplete={async () => {}} />
-          : <Navigate to="/" replace />}
+        element={
+          token && user ? (
+            <TaskDetail
+              token={token}
+              onDeleteTask={async (id) => {
+                await fetch(`${API_BASE}/api/tasks/${id}`, {
+                  method: "DELETE",
+                  headers: { Authorization: `Bearer ${token}` },
+                });
+              }}
+              onToggleComplete={async (task) => {
+                await fetch(`${API_BASE}/api/tasks/${task.id}`, {
+                  method: "PATCH",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({
+                    title: task.title,
+                    description: task.description,
+                    deadline: task.deadline,
+                    priority: task.priority,
+                    completed: !task.completed,
+                  }),
+                });
+              }}
+            />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
       />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
