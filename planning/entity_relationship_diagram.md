@@ -68,25 +68,4 @@ Reference the Creating an Entity Relationship Diagram final project guide in the
 
 ### Entity Relationship Diagram
 
-```
-users
- ├── id (PK)
- ├── full_name
- ├── email
- ├── password
- └── created_at
-      │
-      │ 1:N
-      ▼
-tasks                          task_tags (join)        tags
- ├── id (PK)                    ├── task_id (FK) ──────► ├── id (PK)
- ├── title                      └── tag_id  (FK)         ├── name
- ├── description                                         ├── color
- ├── deadline                                            └── user_id (FK)
- ├── priority
- ├── status
- ├── user_id (FK)
- └── created_at
-```
-
 ![ER Diagram](./images/erd-new.png)
