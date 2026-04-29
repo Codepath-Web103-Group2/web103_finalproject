@@ -1,13 +1,14 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "routes": [
+  "outputDirectory": "client/dist",
+  "rewrites": [
     {
-      "handle": "filesystem"
+      "source": "/api/:path*",
+      "destination": "https://studybuddy-backend-ksac.onrender.com/api/:path*"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/:path*",
+      "destination": "/index.html"
     }
   ]
 }
